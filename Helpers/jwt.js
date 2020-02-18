@@ -1,9 +1,7 @@
 const jwt = require('jsonwebtoken');
 
 module.exports = {
-    createJWTToken : (payload,expire) => {
-        return jwt.sign(payload, 'uniqueKey', {
-            expiresIn: `${expire}`
-        })
+    createJWToken : (payload) => {
+        return jwt.sign(payload, 'shuu', { expiresIn: '12h'})
     }
 }
