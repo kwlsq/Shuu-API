@@ -40,13 +40,13 @@ module.exports = {
     },
     register: (req, res) => {
         console.log(req.body)
+        req.body.id_role = 3;
         var { username, password, email, id_role } = req.body
         const hashPassword = Crypto.createHmac('sha256', 'shuu').update(password).digest('hex')
         console.log(hashPassword)
         const sql = `INSERT INTO users(username, password, email, id_role) values ('${username}','${hashPassword}','${email}','${id_role}')`
         connection.query(sql, (err, results) => {
             if (err) {
-                console.log('error1 ')
                 res.status(500).send(err)
             }
             const sql2 = `SELECT * FROM users WHERE username = '${username}'`
@@ -62,7 +62,7 @@ module.exports = {
                     subject: 'Confirmation Email',
                     html: `
                         <h2>Hi, This is a verification mail</h2>
-                        <h3>Please click the link below to verified your account</h3>
+                        <h3>Please click the link below to verify your account</h3>
                         <a href='${verificationLink}'>click this link!</a>
                         `
                 }
@@ -78,6 +78,25 @@ module.exports = {
             console.log(results)
 
             res.status(200).send(results)
+        })
+    },
+    emailVerification: (req, res) => {
+        console.log(req.body)
+        let { username, password } = req.body
+        const sql = `SELECT * FROM users WHERE username = '${username}' and password = '${password}'`
+        connection.query(sql, (err, results) => {
+            if (err) {
+                res.status(500).send(err)
+            }
+            console.log(results)
+            const sql2 = `UPDATE users SET verified = 1 WHERE username = '${username}'`
+            connection.query(sql2, (err, results2) => {
+                if (err) {
+                    res.status(500).send(err)
+                }
+                console.log(results2)
+                res.status(200).send(results2)
+            })
         })
     }
 
