@@ -7,17 +7,17 @@ module.exports = {
     login: (req, res) => {
         let { username, password } = req.body
         const hashPassword = Crypto.createHmac('sha256', 'shuu').update(password).digest('hex')
-        const sql = `SELECT * FROM users WHERE username = '${username}' and password = '${hashPassword}'`
+        const sql = `SELECT * FROM users WHERE username = ${connection.escape(username)} and password = ${connection.escape(hashPassword)}`
         connection.query(sql, (err, results) => {
             if (err) {
                 res.status(500).send(err)
             }
             if (results.length !== 0) {
-                let { id, username, password, email, verified, id_role } = results[0]
+                let { id, username, email, verified, id_role } = results[0]
                 const token = createJWToken({
                     id, username, email, verified, id_role
                 })
-                res.status(200).send({ id, password, username, email, verified, id_role, token })
+                res.status(200).send({ ...results[0], token })
             } else {
                 res.status(500).send({ message: 'Username or Password Invalid' })
             }
@@ -42,14 +42,23 @@ module.exports = {
         console.log(req.body)
         req.body.id_role = 3;
         var { username, password, email, id_role } = req.body
+        var today = new Date()
+        var date = `${today.getFullYear()}-${today.getMonth() + 1}-${today.getDate()}`
         const hashPassword = Crypto.createHmac('sha256', 'shuu').update(password).digest('hex')
-        console.log(hashPassword)
-        const sql = `INSERT INTO users(username, password, email, id_role) values ('${username}','${hashPassword}','${email}','${id_role}')`
+        console.log(date)
+        const sql = `INSERT INTO users(username, password, email, createdat, id_role) 
+        values (
+            ${connection.escape(username)},
+            ${connection.escape(hashPassword)},
+            ${connection.escape(email)},
+            ${connection.escape(date)}, 
+            ${connection.escape(id_role)
+            })`
         connection.query(sql, (err, results) => {
             if (err) {
                 res.status(500).send(err)
             }
-            const sql2 = `SELECT * FROM users WHERE username = '${username}'`
+            const sql2 = `SELECT * FROM users WHERE username = ${connection.escape(username)} `
             connection.query(sql2, (err, results2) => {
                 if (err) {
                     console.log('error2')
@@ -70,8 +79,6 @@ module.exports = {
                     if (err) {
                         res.status(500).send(err)
                     }
-                    console.log('yak pulang')
-                    console.log(results3)
                     res.status(200).send(results3)
                 })
             })
@@ -83,13 +90,13 @@ module.exports = {
     emailVerification: (req, res) => {
         console.log(req.body)
         let { username, password } = req.body
-        const sql = `SELECT * FROM users WHERE username = '${username}' and password = '${password}'`
+        const sql = `SELECT * FROM users WHERE username = ${connection.escape(username)} and password = ${connection.escape(password)}`
         connection.query(sql, (err, results) => {
             if (err) {
                 res.status(500).send(err)
             }
             console.log(results)
-            const sql2 = `UPDATE users SET verified = 1 WHERE username = '${username}'`
+            const sql2 = `UPDATE users SET verified = 1 WHERE username = ${connection.escape(username)}`
             connection.query(sql2, (err, results2) => {
                 if (err) {
                     res.status(500).send(err)
