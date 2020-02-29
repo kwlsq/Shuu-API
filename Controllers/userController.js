@@ -7,15 +7,15 @@ module.exports = {
     login: (req, res) => {
         let { username, password } = req.body
         const hashPassword = Crypto.createHmac('sha256', 'shuu').update(password).digest('hex')
-        const sql = `SELECT * FROM users WHERE username = ${connection.escape(username)} and password = ${connection.escape(hashPassword)}`
+        const sql = `SELECT * FROM users WHERE username = ${connection.escape(username.toLowerCase())} and password = ${connection.escape(hashPassword)}`
         connection.query(sql, (err, results) => {
             if (err) {
                 res.status(500).send(err)
             }
             if (results.length !== 0) {
-                let { id, username, email, verified, id_role } = results[0]
+                let { id, username, email, verified, role_id } = results[0]
                 const token = createJWToken({
-                    id, username, email, verified, id_role
+                    id, username, email, verified, role_id
                 })
                 res.status(200).send({ ...results[0], token })
             } else {
@@ -40,19 +40,19 @@ module.exports = {
     },
     register: (req, res) => {
         console.log(req.body)
-        req.body.id_role = 3;
-        var { username, password, email, id_role } = req.body
+        req.body.role_id = 3;
+        var { username, password, email, role_id } = req.body
         var today = new Date()
         var date = `${today.getFullYear()}-${today.getMonth() + 1}-${today.getDate()}`
         const hashPassword = Crypto.createHmac('sha256', 'shuu').update(password).digest('hex')
         console.log(date)
-        const sql = `INSERT INTO users(username, password, email, createdat, id_role) 
+        const sql = `INSERT INTO users(username, password, email, createdat, role_id) 
         values (
-            ${connection.escape(username)},
+            ${connection.escape(username.toLowerCase())},
             ${connection.escape(hashPassword)},
-            ${connection.escape(email)},
+            ${connection.escape(email.toLowerCase())},
             ${connection.escape(date)}, 
-            ${connection.escape(id_role)
+            ${connection.escape(role_id)
             })`
         connection.query(sql, (err, results) => {
             if (err) {
@@ -105,6 +105,20 @@ module.exports = {
                 res.status(200).send(results2)
             })
         })
+    },
+    getUsersData: (req, res) => {
+        console.log('ini', req.user)
+        if (req.user.id === 1 && req.user.role_id === 1) {
+            const sql = `SELECT u.id,u.username,u.email,u.verified,u.createdat,r.role from users u join roles r on u.role_id=r.id;`
+            connection.query(sql, (err, results) => {
+                if (err) {
+                    res.status(500).send(err)
+                    console.log(err)
+                }
+                console.log(results)
+                res.status(200).send(results)
+            })
+        }
     }
 
 
