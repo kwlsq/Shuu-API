@@ -1,8 +1,11 @@
 const connection = require('../Databases')
 
 module.exports = {
-    getAllBrands: (req, res) => {
-        const sql = `SELECT * FROM brands`
+    showcase: (req, res) => {
+        const sql = `SELECT p.id,p.name,p.price,p.stock,p.image,b.name AS brands,b.profilepic 
+        FROM products p 
+        JOIN brands b ON p.store_id=b.id;
+        `
 
         connection.query(sql, (err, results) => {
             if (err) {

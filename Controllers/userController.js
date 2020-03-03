@@ -2,6 +2,7 @@ const connection = require('../Databases');
 const { createJWToken } = require('../Helpers/jwt');
 const Crypto = require('crypto');
 const transporter = require('../Helpers/nodemailer');
+const { uploader } = require('../Helpers/uploader');
 
 module.exports = {
     login: (req, res) => {
@@ -10,7 +11,7 @@ module.exports = {
         const sql = `SELECT * FROM users WHERE username = ${connection.escape(username.toLowerCase())} and password = ${connection.escape(hashPassword)}`
         connection.query(sql, (err, results) => {
             if (err) {
-                res.status(500).send(err)
+                return res.status(500).send(err)
             }
             if (results.length !== 0) {
                 let { id, username, email, verified, role_id } = results[0]
@@ -32,7 +33,7 @@ module.exports = {
         const sql = `SELECT username FROM users where username = ${connection.escape(req.params.username)}`
         connection.query(sql, (err, results) => {
             if (err) {
-                res.status(500).send(err)
+                return res.status(500).send(err)
             }
             console.log(results)
             res.status(200).send(results)
@@ -56,7 +57,7 @@ module.exports = {
             })`
         connection.query(sql, (err, results) => {
             if (err) {
-                res.status(500).send(err)
+                return res.status(500).send(err)
             }
             const sql2 = `SELECT * FROM users WHERE username = ${connection.escape(username)} `
             connection.query(sql2, (err, results2) => {
@@ -93,7 +94,7 @@ module.exports = {
         const sql = `SELECT * FROM users WHERE username = ${connection.escape(username)} and password = ${connection.escape(password)}`
         connection.query(sql, (err, results) => {
             if (err) {
-                res.status(500).send(err)
+                return res.status(500).send(err)
             }
             console.log(results)
             const sql2 = `UPDATE users SET verified = 1 WHERE username = ${connection.escape(username)}`
@@ -112,8 +113,7 @@ module.exports = {
             const sql = `SELECT u.id,u.username,u.email,u.verified,u.createdat,r.role from users u join roles r on u.role_id=r.id;`
             connection.query(sql, (err, results) => {
                 if (err) {
-                    res.status(500).send(err)
-                    console.log(err)
+                    return res.status(500).send(err)
                 }
                 console.log(results)
                 res.status(200).send(results)
