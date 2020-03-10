@@ -67,7 +67,7 @@ module.exports = {
                 }
                 let verificationLink = `http://localhost:3000/verified?username=${username}&password=${hashPassword}`
                 let mailOptions = {
-                    from: 'Admin <vincentiussss@gmail.com',
+                    from: 'Admin Keren <vincentiusssss@gmail.com>',
                     to: 'vincentiussss@gmail.com',
                     subject: 'Confirmation Email',
                     html: `
@@ -119,7 +119,23 @@ module.exports = {
                 res.status(200).send(results)
             })
         }
-    }
+    },
+    getUserDetail: (req, res) => {
+        console.log('masukgetuserdetail')
+        const sql = `
+        SELECT u.id,u.username,u.email,u.verified,u.createdat,ud.first_name,ud.last_name,ud.address,ud.birth_date,ud.gender,ud.profilepic,r.role 
+        FROM users u 
+        JOIN users_detail ud ON u.users_detail_id=ud.id 
+        JOIN roles r ON u.role_id=r.id
+        WHERE u.id=${req.user.id};`
+        connection.query(sql, (err, results) => {
+            if (err) {
+                return res.status(500).send(err)
+            }
+
+            res.status(200).send(results[0])
+        })
+    },
 
 
 }

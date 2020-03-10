@@ -6,5 +6,6 @@ const { auth } = require('../Helpers/auth')
 
 router.get('/showcase', productController.showcase)
 router.post('/detailproduct', productController.detailProduct)
+router.post('/availsize', productController.availableSize)
 
 module.exports = router

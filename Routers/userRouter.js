@@ -10,5 +10,6 @@ router.get('/:username', userController.getByUsername)
 router.get('/', auth, userController.getUsersData)
 router.post('/register', userController.register)
 router.post('/verify', userController.emailVerification)
+router.put('/profile', auth, userController.getUserDetail)
 
 module.exports = router
