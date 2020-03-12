@@ -122,7 +122,7 @@ module.exports = {
     getUserDetail: (req, res) => {
         console.log('masukgetuserdetail')
         const sql = `
-        SELECT u.id,u.username,u.email,u.verified,u.createdat,ud.first_name,ud.last_name,ud.province,ud.city,ud.address_detail,ud.birth_date,ud.gender,ud.profilepic,r.role 
+        SELECT u.id,ud.id as ud_id,u.username,u.email,u.verified,u.createdat,ud.first_name,ud.last_name,ud.province,ud.city,ud.address_detail,ud.birth_date,ud.gender,ud.profilepic,r.role 
         FROM users u 
         JOIN users_detail ud ON u.users_detail_id=ud.id 
         JOIN roles r ON u.role_id=r.id
