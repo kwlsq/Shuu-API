@@ -5,6 +5,7 @@ const { auth } = require('../Helpers/auth')
 
 
 router.post('/addprofpic', auth, editProfileController.addProfilePict)
+router.post('/updateprofile/:id', auth, editProfileController.updateProfile)
 
 
 module.exports = router

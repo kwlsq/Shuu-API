@@ -39,11 +39,37 @@ module.exports = {
                         console.log('error')
                         return res.status(500).send(err)
                     }
-                    console.log(results2)
+                    // console.log(results2)
                     res.status(200).send(results2[0])
 
                 })
 
+            })
+        })
+    },
+    updateProfile: (req, res) => {
+        console.log('masuk')
+        console.log(req.body)
+        const sql = `UPDATE users_detail SET ? WHERE id='${req.params.id}'`
+        connection.query(sql, req.body, (err, results) => {
+            if (err) {
+                console.log('error')
+                return res.status(500).send(err)
+            }
+            console.log(results)
+            console.log(req.params.id)
+            const sql2 = `SELECT u.id,ud.id as ud_id,u.username,u.email,u.verified,u.createdat,ud.first_name,ud.last_name,ud.province,ud.city,ud.address_detail,ud.birth_date,ud.gender,ud.profilepic,r.role 
+            FROM users u 
+            JOIN users_detail ud ON u.users_detail_id=ud.id 
+            JOIN roles r ON u.role_id=r.id
+            WHERE u.id=${req.user.id};`
+            connection.query(sql2, (err, results2) => {
+                if (err) {
+                    console.log('error')
+                    return res.status(500).send(err)
+                }
+                console.log(results2)
+                res.status(200).send(results2[0])
             })
         })
     }
