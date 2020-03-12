@@ -15,8 +15,7 @@ app.use(express.static('public'))
 const {
     brandsRouter,
     userRouter,
-    productRouter,
-    editProfileRouter
+    productRouter
 } = require('./Routers')
 
 app.get('/', (req, res) => {
@@ -26,7 +25,6 @@ app.get('/', (req, res) => {
 app.use('/brands', brandsRouter)
 app.use('/products', productRouter)
 app.use('/users', userRouter)
-app.use('/editprofile', editProfileRouter)
 
 
 app.listen(PORT, () => console.log(`API berhasil aktif di PORT ${PORT}`))

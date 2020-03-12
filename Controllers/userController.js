@@ -2,6 +2,7 @@ const connection = require('../Databases');
 const { createJWToken } = require('../Helpers/jwt');
 const Crypto = require('crypto');
 const transporter = require('../Helpers/nodemailer');
+const { uploader } = require('../Helpers/uploader');
 
 module.exports = {
     login: (req, res) => {
