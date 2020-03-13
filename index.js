@@ -17,7 +17,8 @@ const {
     userRouter,
     productRouter,
     editProfileRouter,
-    rajaOngkirRouter
+    rajaOngkirRouter,
+    transactionRouter
 } = require('./Routers')
 
 app.get('/', (req, res) => {
@@ -29,6 +30,7 @@ app.use('/products', productRouter)
 app.use('/users', userRouter)
 app.use('/editprofile', editProfileRouter)
 app.use('/rajaongkir', rajaOngkirRouter)
+app.use('/transaction', transactionRouter)
 
 
 app.listen(PORT, () => console.log(`API berhasil aktif di PORT ${PORT}`))
