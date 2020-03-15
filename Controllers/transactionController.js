@@ -109,20 +109,22 @@ module.exports = {
     getCartValuesByUserId: (req, res) => {
         console.log(req.user, 'masuk ke sini')
         const sql = `SELECT c.id,c.user_id,c.product_id,u.username,pn.name,p.image
-        ,b.name as brands,b.profilepic,p.price,p.stock,c.qty,c.total_weight,c.total_price 
-        FROM cart c 
-        JOIN users u ON c.user_id=u.id 
-        JOIN products p ON c.product_id=p.id 
-        JOIN product_name pn ON p.product_name_id=pn.id 
-        JOIN brands b ON p.store_id=b.id
-        WHERE c.user_id=${req.user.id}
+            ,b.name as brands,b.profilepic,p.price,p.stock,c.qty,c.total_weight,c.total_price,
+            bd.province,bd.province_id ,bd.city,bd.city_id ,bd.address_detail
+            FROM cart c 
+            JOIN users u ON c.user_id=u.id 
+            JOIN products p ON c.product_id=p.id 
+            JOIN product_name pn ON p.product_name_id=pn.id 
+            JOIN brands b ON p.store_id=b.id
+            JOIN brands_detail bd ON b.brands_detail_id=bd.id
+            WHERE c.user_id=${req.user.id}
         ;`
 
         connection.query(sql, (err, results) => {
             if (err) {
                 return res.status(500).send(err)
             }
-
+            console.log('kena', results)
             return res.status(200).send(results)
         })
     },
@@ -150,12 +152,11 @@ module.exports = {
                 if (err) {
                     return res.status(500).send(err)
                 }
-                const sql3 = `SELECT id,sum(total_price) AS total_payment FROM cart;`
+                const sql3 = `SELECT id,sum(total_price) AS total_payment FROM cart WHERE user_id = ${req.user.id};`
                 connection.query(sql3, (err, results3) => {
                     if (err) {
                         return res.status(500).send(err)
                     }
-                    console.log({ results2, results3 }, 'nahini')
                     return res.status(200).send({ results2, results3 })
                 })
             })
@@ -164,7 +165,7 @@ module.exports = {
     getTotalPayment: (req, res) => {
         console.log(req.user.id)
         const sql = `SELECT id,user_id,SUM(total_price) AS total_payment 
-        FROM cart where user_id = ${req.user.id};`
+        FROM cart WHERE user_id = ${req.user.id};`
         connection.query(sql, (err, results) => {
             if (err) {
                 return res.status(500).send(err)
@@ -202,7 +203,9 @@ module.exports = {
                 if (err) {
                     return res.status(500).send(err)
                 }
-                const sql3 = `SELECT id,sum(total_price) AS total_payment FROM cart;`
+                const sql3 = `SELECT id,sum(total_price) AS total_payment 
+                FROM cart 
+                WHERE user_id = ${req.user.id};`
                 connection.query(sql3, (err, results3) => {
                     if (err) {
                         return res.status(500).send(err)
