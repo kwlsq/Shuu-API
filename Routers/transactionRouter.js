@@ -5,6 +5,11 @@ const { transactionController } = require('../Controllers')
 
 
 router.post('/addtocart', auth, transactionController.addToCart)
+router.get('/cart', auth, transactionController.getCartValuesByUserId)
+router.put('/changeqty', auth, transactionController.changeQty)
+router.get('/gettotalpayment', auth, transactionController.getTotalPayment)
+router.get('/deleteall', auth, transactionController.deleteAllByUserId)
+router.put('/deleteproduct', auth, transactionController.deleteProduct)
 
 
 
