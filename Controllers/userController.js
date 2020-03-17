@@ -136,6 +136,18 @@ module.exports = {
             res.status(200).send(results[0])
         })
     },
+    getUserAddress: (req, res) => {
+        console.log(req.user, 'inireq')
+        const sql = `SELECT first_name,province,province_id,city,city_id,address_detail 
+        FROM users_detail 
+        WHERE user_id=${req.user.id};`
+        connection.query(sql, (err, results) => {
+            if (err) {
+                return res.status(500).send(err)
+            }
 
+            res.status(200).send(results[0])
+        })
+    }
 
 }

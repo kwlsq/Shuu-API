@@ -116,7 +116,7 @@ module.exports = {
             JOIN products p ON c.product_id=p.id 
             JOIN product_name pn ON p.product_name_id=pn.id 
             JOIN brands b ON p.store_id=b.id
-            JOIN brands_detail bd ON b.brands_detail_id=bd.id
+            JOIN brands_detail bd ON bd.brand_id=b.id
             WHERE c.user_id=${req.user.id}
         ;`
 
