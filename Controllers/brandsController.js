@@ -2,7 +2,9 @@ const connection = require('../Databases')
 
 module.exports = {
     getAllBrands: (req, res) => {
-        const sql = `SELECT * FROM brands`
+        const sql = `SELECT * 
+        FROM brands
+        WHERE profilepic != '/default/default.jpg'`
 
         connection.query(sql, (err, results) => {
             if (err) {

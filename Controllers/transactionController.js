@@ -1,4 +1,6 @@
 const connection = require('../Databases');
+const { uploader } = require('../Helpers/uploader');
+const fs = require('fs')
 
 module.exports = {
     addToCart: (req, res) => {
@@ -23,12 +25,12 @@ module.exports = {
                     return res.status(500).send(err)
                 }
                 console.log(results2.length, 'length')
-                if (results2.length === 0) { //kalo item yang dipilih masih kosong, berarti tinggal insert aja
+                if (results2.length === 0 || results2.transaction_id !== 0) { //kalo item yang dipilih masih kosong, berarti tinggal insert aja
                     console.log('masuk yg atas', req.user.id)
                     console.log('masuk yg atas', req.body.id)
-                    const sql3 = `INSERT INTO cart(user_id,product_id,qty,total_weight,total_price) 
+                    const sql3 = `INSERT INTO cart(user_id,product_id,qty,total_weight,total_price,total_ongkir) 
                     VALUES('${req.user.id}','${req.body.id}','${req.body.qty}','${results[0].weight * req.body.qty}',
-                    '${results[0].price * req.body.qty}')`
+                    '${results[0].price * req.body.qty}',0)`
                     connection.query(sql3, (err, results3) => {
                         if (err) {
                             console.log('disini masalahnya')
@@ -42,7 +44,7 @@ module.exports = {
                         JOIN products p ON c.product_id=p.id 
                         JOIN product_name pn ON p.product_name_id=pn.id 
                         JOIN brands b ON p.store_id=b.id
-                        WHERE c.user_id='${req.user.id}';
+                        WHERE c.user_id='${req.user.id}' && transaction_id=0;
                         `
                         console.log(results3)
                         connection.query(sql4, (err, results4) => {
@@ -89,7 +91,7 @@ module.exports = {
                             JOIN products p ON c.product_id=p.id 
                             JOIN product_name pn ON p.product_name_id=pn.id 
                             JOIN brands b ON p.store_id=b.id
-                            WHERE c.user_id='${req.user.id}';
+                            WHERE c.user_id='${req.user.id}' && transaction_id=0;
                             `
                             console.log(results3)
                             connection.query(sql5, (err, results5) => {
@@ -117,7 +119,7 @@ module.exports = {
             JOIN product_name pn ON p.product_name_id=pn.id 
             JOIN brands b ON p.store_id=b.id
             JOIN brands_detail bd ON bd.brand_id=b.id
-            WHERE c.user_id=${req.user.id}
+            WHERE c.user_id=${req.user.id} && transaction_id=0
         ;`
 
         connection.query(sql, (err, results) => {
@@ -146,7 +148,7 @@ module.exports = {
             JOIN products p ON c.product_id=p.id 
             JOIN product_name pn ON p.product_name_id=pn.id 
             JOIN brands b ON p.store_id=b.id
-            WHERE c.user_id=${req.user.id}
+            WHERE c.user_id=${req.user.id} && transaction_id=0
             ;`
             connection.query(sql2, (err, results2) => {
                 if (err) {
@@ -165,7 +167,7 @@ module.exports = {
     getTotalPayment: (req, res) => {
         console.log(req.user.id)
         const sql = `SELECT id,user_id,SUM(total_price) AS total_payment 
-        FROM cart WHERE user_id = ${req.user.id};`
+        FROM cart WHERE user_id = ${req.user.id} && transaction_id=0;`
         connection.query(sql, (err, results) => {
             if (err) {
                 return res.status(500).send(err)
@@ -175,7 +177,7 @@ module.exports = {
     },
     deleteAllByUserId: (req, res) => {
         const sql = `DELETE FROM cart 
-        WHERE user_id=${req.user.id}`
+        WHERE user_id=${req.user.id} && transaction_id=0`
         connection.query(sql, (err, results) => {
             if (err) {
                 return res.status(500).send(err)
@@ -185,7 +187,7 @@ module.exports = {
     },
     deleteProduct: (req, res) => {
         const sql = `DELETE FROM cart
-        WHERE user_id=${req.user.id} && product_id=${req.body.p_id};`
+        WHERE user_id=${req.user.id} && product_id=${req.body.p_id} && transaction_id=0;`
         connection.query(sql, (err, results) => {
             if (err) {
                 return res.status(500).send(err)
@@ -197,7 +199,7 @@ module.exports = {
             JOIN products p ON c.product_id=p.id 
             JOIN product_name pn ON p.product_name_id=pn.id 
             JOIN brands b ON p.store_id=b.id
-            WHERE c.user_id=${req.user.id}
+            WHERE c.user_id=${req.user.id} && transaction_id=0
             ;`
             connection.query(sql2, (err, results2) => {
                 if (err) {
@@ -215,5 +217,59 @@ module.exports = {
             })
         })
 
+    },
+    uploadPaymentReceipt: (req, res) => {
+        console.log(req.user)
+
+        const path = '/payment';
+        const upload = uploader(path, 'PAYMENT').fields([{ name: 'image' }]);
+        upload(req, res, (err) => {
+            if (err) {
+                return res.status(500).send({ message: 'Upload file failed !', error: err.message });
+            }
+            const { image } = req.files;
+            console.log(image, 'ini image')
+
+            console.log(req.body, 'ini req.body')
+            req.body.image = `${path}/${image[0].filename}`
+            console.log(req.body.image)
+            console.log(req.body.total_price)
+
+
+            const x = new Date()
+            const date = `${x.getFullYear()}-${x.getMonth() + 1}-${x.getDate()} ${x.getHours()}:${x.getMinutes()}:${x.getSeconds()}`
+            //Pertama kita masukin data2 untuk table transaction
+            const sql = `INSERT INTO 
+            transaction(user_id,total_price,transaction_date,payment_receipt) 
+            VALUES ('${req.user.id}','${req.body.total_price}','${date}','${req.body.image}')`
+
+            connection.query(sql, (err, results) => {
+                if (err) {
+                    console.log(err, 'yah gagal')
+                    fs.unlinkSync('./public' + path + '/' + image[0].filename)
+                    return res.status(500).send({ message: 'Add Post Failed!', err })
+                }
+                console.log(results, 'yesss acil')
+                //abis itu ambil datanya, mau pake id nya buat dimasukkin ke cart
+                const sql2 = `SELECT * FROM transaction;`
+                connection.query(sql2, (err, results2) => {
+                    if (err) {
+                        return res.status(500).send(err)
+                    }
+                    console.log(results2[0], 'berhasil ngambil data transacton')
+
+                    //terus kita update transaction id di cart, supaya cart yang sudah di checkout tidak muncul lagi
+                    console.log(results2.length, 'LENGTH')
+                    const sql3 = `UPDATE cart SET transaction_id='${results2[results2.length - 1].id}' WHERE transaction_id=0`
+                    connection.query(sql3, (err, results3) => {
+                        if (err) {
+                            return res.status(500).send(err)
+                        }
+                        console.log(results3)
+                        return res.status(200)
+                    })
+                })
+            })
+        })
     }
 }

@@ -5,7 +5,10 @@ module.exports = {
         const sql = `SELECT p.id,pn.id as pn_id,pn.name,b.name AS brands,p.image,b.profilepic,p.price,p.stock,p.views 
         FROM products p 
         JOIN product_name pn ON p.product_name_id=pn.id 
-        JOIN brands b ON p.store_id=b.id;`
+        JOIN brands b ON p.store_id=b.id
+        WHERE p.image != '/default/default.jpg'
+        GROUP BY product_name_id;
+        `
 
         connection.query(sql, (err, results) => {
             if (err) {
@@ -64,6 +67,9 @@ module.exports = {
             console.log(results[0])
             res.status(200).send(results[0])
         })
+    },
+    searchProductAndBrand: (req, res) => {
+
     }
 
 }

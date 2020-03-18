@@ -34,6 +34,9 @@ module.exports = {
     },
     shippingCost: (req, res) => {
         const form = req.body;
+        if (form.courier === 'DEFAULT') {
+            form.courier = 'jne'
+        }
         console.log(form)
         const data = {
             origin: form.origin,
@@ -49,7 +52,9 @@ module.exports = {
             console.log(costPrice)
 
             const sql = `UPDATE cart 
-            SET total_ongkir='${costPrice}' 
+            SET 
+            total_ongkir='${costPrice}',
+            courier='${form.courier}'
             WHERE id=${req.body.id}`
             connection.query(sql, (err, results) => {
                 if (err) {
