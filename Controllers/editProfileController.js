@@ -30,7 +30,7 @@ module.exports = {
                 }
                 const sql2 = `SELECT u.id,ud.id as ud_id,u.username,u.email,u.verified,u.createdat,ud.first_name,ud.last_name,ud.province,ud.city,ud.address_detail,ud.birth_date,ud.gender,ud.profilepic,r.role 
                 FROM users u 
-                JOIN users_detail ud ON u.users_detail_id=ud.id 
+                JOIN users_detail ud ON u.id=ud.user_id
                 JOIN roles r ON u.role_id=r.id
                 WHERE u.id=${req.user.id};`
 
@@ -50,7 +50,8 @@ module.exports = {
     updateProfile: (req, res) => {
         console.log('masuk')
         console.log(req.body)
-        const sql = `UPDATE users_detail SET ? WHERE id='${req.params.id}'`
+        console.log(req.user)
+        const sql = `UPDATE users_detail SET ? WHERE user_id='${req.user.id}'`
         connection.query(sql, req.body, (err, results) => {
             if (err) {
                 console.log('error')
@@ -60,7 +61,7 @@ module.exports = {
             console.log(req.params.id)
             const sql2 = `SELECT u.id,ud.id as ud_id,u.username,u.email,u.verified,u.createdat,ud.first_name,ud.last_name,ud.province,ud.city,ud.address_detail,ud.birth_date,ud.gender,ud.profilepic,r.role 
             FROM users u 
-            JOIN users_detail ud ON u.users_detail_id=ud.id 
+            JOIN users_detail ud ON u.id=ud.user_id
             JOIN roles r ON u.role_id=r.id
             WHERE u.id=${req.user.id};`
             connection.query(sql2, (err, results2) => {

@@ -67,7 +67,7 @@ module.exports = {
                 }
                 let verificationLink = `http://localhost:3000/verified?username=${username}&password=${hashPassword}`
                 let mailOptions = {
-                    from: 'Admin Keren <vincentiusssss@gmail.com>',
+                    from: 'Shuu Admin <vincentiusssss@gmail.com>',
                     to: 'vincentiussss@gmail.com',
                     subject: 'Confirmation Email',
                     html: `
@@ -125,7 +125,7 @@ module.exports = {
         const sql = `
         SELECT u.id,ud.id as ud_id,u.username,u.email,u.verified,u.createdat,ud.first_name,ud.last_name,ud.province,ud.city,ud.address_detail,ud.birth_date,ud.gender,ud.profilepic,r.role 
         FROM users u 
-        JOIN users_detail ud ON u.users_detail_id=ud.id 
+        JOIN users_detail ud ON u.id=ud.user_id
         JOIN roles r ON u.role_id=r.id
         WHERE u.id=${req.user.id};`
         connection.query(sql, (err, results) => {
