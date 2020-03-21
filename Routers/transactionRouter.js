@@ -12,6 +12,8 @@ router.get('/deleteall', auth, transactionController.deleteAllByUserId)
 router.put('/deleteproduct', auth, transactionController.deleteProduct)
 router.post('/receipt', auth, transactionController.uploadPaymentReceipt)
 router.get('/history', auth, transactionController.getTransactionHistory)
+router.post('/detail', auth, transactionController.getCartValuesByTransactionId)
+router.put('/stock', auth, transactionController.updateStock)
 
 
 

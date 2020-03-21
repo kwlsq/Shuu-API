@@ -19,7 +19,7 @@ module.exports = {
             console.log(results[0])
             console.log(results[0].price * req.body.qty)
             console.log(results[0].weight * req.body.qty)
-            const sql2 = `SELECT * FROM cart WHERE product_id='${results[0].id}' && transaction_id=0` //untuk cek apakah cart dari item yg dipilih kosong atau ad item yg sama
+            const sql2 = `SELECT * FROM cart WHERE product_id='${results[0].id}' AND transaction_id=0` //untuk cek apakah cart dari item yg dipilih kosong atau ad item yg sama
             connection.query(sql2, (err, results2) => {
                 if (err) {
                     return res.status(500).send(err)
@@ -45,7 +45,7 @@ module.exports = {
                         JOIN sizes s ON p.size_id=s.id
                         JOIN product_name pn ON p.product_name_id=pn.id 
                         JOIN brands b ON p.store_id=b.id
-                        WHERE c.user_id='${req.user.id}' && transaction_id=0;
+                        WHERE c.user_id='${req.user.id}' AND transaction_id=0;
                         `
                         console.log(results3)
                         connection.query(sql4, (err, results4) => {
@@ -83,17 +83,17 @@ module.exports = {
                                 console.log(err)
                                 return res.status(500).send(err)
                             }
-                            console.log(results4)
+                            console.log(results4, 'okkk')
                             const sql5 = `
                             SELECT c.id,c.user_id,c.product_id,u.username,pn.name,p.image
-                            ,b.name,b.profilepic.s.size,p.price,p.stock,c.qty,c.total_weight,c.total_price 
+                            ,b.name,b.profilepic,s.size,p.price,p.stock,c.qty,c.total_weight,c.total_price 
                             FROM cart c 
                             JOIN users u ON c.user_id=u.id 
                             JOIN products p ON c.product_id=p.id
                             JOIN sizes s ON p.size_id=s.id
                             JOIN product_name pn ON p.product_name_id=pn.id 
                             JOIN brands b ON p.store_id=b.id
-                            WHERE c.user_id='${req.user.id}' && transaction_id=0;
+                            WHERE c.user_id='${req.user.id}' AND transaction_id=0;
                             `
                             console.log(results3)
                             connection.query(sql5, (err, results5) => {
@@ -122,7 +122,31 @@ module.exports = {
             JOIN product_name pn ON p.product_name_id=pn.id 
             JOIN brands b ON p.store_id=b.id
             JOIN brands_detail bd ON bd.brand_id=b.id
-            WHERE c.user_id=${req.user.id} && transaction_id=0
+            WHERE c.user_id=${req.user.id} AND transaction_id=0
+        ;`
+
+        connection.query(sql, (err, results) => {
+            if (err) {
+                return res.status(500).send(err)
+            }
+            console.log('kena', results)
+            return res.status(200).send(results)
+        })
+    },
+    getCartValuesByTransactionId: (req, res) => {
+        console.log(req.user, 'masuk ke sini')
+        console.log(req.body)
+        const sql = `SELECT c.id,c.user_id,c.product_id,u.username,pn.name,p.image
+            ,b.name as brands,b.profilepic,s.size,p.price,p.stock,c.qty,c.total_weight,c.total_price,
+            bd.province,bd.province_id ,bd.city,bd.city_id ,bd.address_detail
+            FROM cart c 
+            JOIN users u ON c.user_id=u.id 
+            JOIN products p ON c.product_id=p.id
+            JOIN sizes s ON p.size_id=s.id
+            JOIN product_name pn ON p.product_name_id=pn.id 
+            JOIN brands b ON p.store_id=b.id
+            JOIN brands_detail bd ON bd.brand_id=b.id
+            WHERE c.user_id=${req.user.id} && transaction_id=${req.body.t_id}
         ;`
 
         connection.query(sql, (err, results) => {
@@ -264,6 +288,8 @@ module.exports = {
                     console.log(results2[0], 'berhasil ngambil data transacton')
 
                     //terus kita update transaction id di cart, supaya cart yang sudah di checkout tidak muncul lagi
+                    //oh iya jangan lupa update jumlah nya, abis kirim bukti transaksi di kurangin qty nya
+                    //tapi nanti pas di action admin confirmation di cek lagi, kalo bukti transfer salah, maka stock balik lg
                     console.log(results2.length, 'LENGTH')
                     const sql3 = `UPDATE cart SET transaction_id='${results2[results2.length - 1].id}' WHERE transaction_id=0`
                     connection.query(sql3, (err, results3) => {
@@ -277,6 +303,20 @@ module.exports = {
             })
         })
     },
+    updateStock: (req, res) => {
+        console.log(req.body, 'updateStock')
+        const sql = `UPDATE stockchange 
+        SET stock=stock-${req.body.qty} 
+        WHERE product_name_id=${req.body.p_id} AND size=${req.body.size};`
+
+        connection.query(sql, (err, results) => {
+            if (err) {
+                return res.status(500).send(err)
+            }
+            return res.status(200).send(results)
+        })
+    },
+
     getTransactionHistory: (req, res) => {
         console.log(req.user, 'transacthistory')
         const sql = `SELECT * FROM transaction WHERE user_id = ${req.user.id};`
