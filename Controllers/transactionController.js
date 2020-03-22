@@ -328,5 +328,36 @@ module.exports = {
             console.log(results[0])
             return res.status(200).send(results)
         })
+    },
+    getAllTransactions: (req, res) => {
+        const sql = `SELECT t.id as t_id,u.username,t.delivery_status,t.admin_confirmation,t.total_price,t.transaction_date,t.payment_receipt 
+        FROM transaction t 
+        JOIN users u ON t.user_id=u.id;`
+        connection.query(sql, (err, results) => {
+            if (err) {
+                return res.status(500).send(err)
+            }
+            console.log(results[0])
+            return res.status(200).send(results)
+        })
+    },
+    adminConfirmation: (req, res) => {
+        console.log(req.body, 'mashok')
+        const sql = `UPDATE transaction SET admin_confirmation=1 WHERE id=${req.body.t_id};`
+        console.log(sql)
+        connection.query(sql, (err, results) => {
+            if (err) {
+                return res.status(500).send(err)
+            }
+            const sql2 = `SELECT t.id as t_id,u.username,t.delivery_status,t.admin_confirmation,t.total_price,t.transaction_date,t.payment_receipt 
+            FROM transaction t 
+            JOIN users u ON t.user_id=u.id;`
+            connection.query(sql2, (err, results2) => {
+                if (err) {
+                    return res.status(500).send(err)
+                }
+                return res.status(200).send(results2)
+            })
+        })
     }
 }

@@ -61,7 +61,6 @@ module.exports = {
         WHERE p.product_name_id ='${req.body.id}' && s.size='${req.body.size}';`
         connection.query(sql, (err, results) => {
             if (err) {
-                console.log(err)
                 return res.status(500).send(err)
             }
             console.log(results[0])
@@ -70,6 +69,36 @@ module.exports = {
     },
     searchProductAndBrand: (req, res) => {
 
+    },
+    menShowcase: (req, res) => {
+        const sql = `SELECT p.id,pn.id as pn_id,pn.name,b.name AS brands,p.image,b.profilepic,p.price,p.stock,p.views,g.id
+        FROM products p 
+        JOIN product_name pn ON p.product_name_id=pn.id 
+        JOIN brands b ON p.store_id=b.id
+        JOIN gender g ON p.gender_id=g.id
+        WHERE p.image != '/default/default.jpg' AND (g.id=1 OR g.id=3)
+        GROUP BY product_name_id;`
+        connection.query(sql, (err, results) => {
+            if (err) {
+                return res.status(500).send(err)
+            }
+            res.status(200).send(results)
+        })
+    },
+    womenShowcase: (req, res) => {
+        const sql = `SELECT p.id,pn.id as pn_id,pn.name,b.name AS brands,p.image,b.profilepic,p.price,p.stock,p.views,g.id
+        FROM products p 
+        JOIN product_name pn ON p.product_name_id=pn.id 
+        JOIN brands b ON p.store_id=b.id
+        JOIN gender g ON p.gender_id=g.id
+        WHERE p.image != '/default/default.jpg' AND (g.id=2 OR g.id=3)
+        GROUP BY product_name_id;`
+        connection.query(sql, (err, results) => {
+            if (err) {
+                return res.status(500).send(err)
+            }
+            res.status(200).send(results)
+        })
     }
 
 }

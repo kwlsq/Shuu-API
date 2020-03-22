@@ -14,6 +14,8 @@ router.post('/receipt', auth, transactionController.uploadPaymentReceipt)
 router.get('/history', auth, transactionController.getTransactionHistory)
 router.post('/detail', auth, transactionController.getCartValuesByTransactionId)
 router.put('/stock', auth, transactionController.updateStock)
+router.get('/', transactionController.getAllTransactions)
+router.put('/confirmation', transactionController.adminConfirmation)
 
 
 
