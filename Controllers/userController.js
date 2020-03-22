@@ -40,7 +40,7 @@ module.exports = {
         })
     },
     register: (req, res) => {
-        console.log(req.body)
+        console.log(req.body, 'registur')
         req.body.role_id = 3;
         var { username, password, email, role_id } = req.body
         var today = new Date()
@@ -55,6 +55,7 @@ module.exports = {
             ${connection.escape(date)}, 
             ${connection.escape(role_id)
             })`
+
         connection.query(sql, (err, results) => {
             if (err) {
                 return res.status(500).send(err)
@@ -65,26 +66,38 @@ module.exports = {
                     console.log('error2')
                     res.status(500).send(err)
                 }
-                let verificationLink = `http://localhost:3000/verified?username=${username}&password=${hashPassword}`
-                let mailOptions = {
-                    from: 'Shuu Admin <vincentiusssss@gmail.com>',
-                    to: 'vincentiussss@gmail.com',
-                    subject: 'Confirmation Email',
-                    html: `
-                        <h2>Hi, This is a verification mail</h2>
-                        <h3>Please click the link below to verify your account</h3>
-                        <a href='${verificationLink}'>click this link!</a>
-                        `
-                }
-                transporter.sendMail(mailOptions, (err, results3) => {
+                const sql3 = `INSERT INTO users_detail(user_id,first_name) VALUES(${results2[0].id},'${results2[0].username}')`
+                connection.query(sql3, (err, results3) => {
                     if (err) {
+                        console.log(err)
                         res.status(500).send(err)
                     }
-                    res.status(200).send(results3)
-                })
-            })
-            console.log(results)
+                    console.log(results3, 'sukses isi user detail')
+                    console.log(results2, 'res 2')
+                    let verificationLink = `http://localhost:3000/verified?username=${username}&password=${hashPassword}`
+                    let mailOptions = {
+                        from: 'Shuu Admin <vincentiusssss@gmail.com>',
+                        to: 'vincentiussss@gmail.com',
+                        subject: 'Confirmation Email',
+                        html: `
+                    <h2>Hi, This is a verification mail</h2>
+                    <h3>Please click the link below to verify your account</h3>
+                    <a href='${verificationLink}'>click this link!</a>
+                    `
+                    }
+                    transporter.sendMail(mailOptions, (err, results3) => {
+                        if (err) {
+                            res.status(500).send(err)
+                        }
+                        res.status(200).send(results3)
+                    })
+                    console.log(results2, 'res 2')
 
+                })
+
+            })
+            console.log(results, 'resoolts')
+            console.log(req.body, 'cek')
             res.status(200).send(results)
         })
     },

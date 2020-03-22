@@ -7,7 +7,8 @@ module.exports = {
         JOIN product_name pn ON p.product_name_id=pn.id 
         JOIN brands b ON p.store_id=b.id
         WHERE p.image != '/default/default.jpg'
-        GROUP BY product_name_id;
+        GROUP BY product_name_id
+        ORDER BY RAND();
         `
 
         connection.query(sql, (err, results) => {
@@ -77,7 +78,8 @@ module.exports = {
         JOIN brands b ON p.store_id=b.id
         JOIN gender g ON p.gender_id=g.id
         WHERE p.image != '/default/default.jpg' AND (g.id=1 OR g.id=3)
-        GROUP BY product_name_id;`
+        GROUP BY product_name_id
+        ORDER BY RAND();`
         connection.query(sql, (err, results) => {
             if (err) {
                 return res.status(500).send(err)
@@ -92,7 +94,8 @@ module.exports = {
         JOIN brands b ON p.store_id=b.id
         JOIN gender g ON p.gender_id=g.id
         WHERE p.image != '/default/default.jpg' AND (g.id=2 OR g.id=3)
-        GROUP BY product_name_id;`
+        GROUP BY product_name_id
+        ORDER BY RAND();`
         connection.query(sql, (err, results) => {
             if (err) {
                 return res.status(500).send(err)
