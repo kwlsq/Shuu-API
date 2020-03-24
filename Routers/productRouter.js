@@ -5,6 +5,7 @@ const { auth } = require('../Helpers/auth')
 
 
 router.get('/showcase', productController.showcase)
+router.put('/more', productController.loadMore)
 router.get('/men', productController.menShowcase)
 router.get('/women', productController.womenShowcase)
 router.post('/detailproduct', productController.detailProduct)
