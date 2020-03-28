@@ -11,5 +11,6 @@ router.get('/women', productController.womenShowcase)
 router.post('/detailproduct', productController.detailProduct)
 router.post('/detailproductbysize', productController.detailProductBySize)
 router.post('/availsize', productController.availableSize)
+router.put('/search', productController.searchProduct)
 
 module.exports = router
