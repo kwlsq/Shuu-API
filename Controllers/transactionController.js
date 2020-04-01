@@ -263,14 +263,15 @@ module.exports = {
             req.body.image = `${path}/${image[0].filename}`
             console.log(req.body.image)
             console.log(req.body.total_price)
-
+            console.log(req.body.province, req.body.city, req.body.address)
 
             const x = new Date()
             const date = `${x.getFullYear()}-${x.getMonth() + 1}-${x.getDate()} ${x.getHours()}:${x.getMinutes()}:${x.getSeconds()}`
             //Pertama kita masukin data2 untuk table transaction
             const sql = `INSERT INTO 
-            transaction(user_id,total_price,transaction_date,payment_receipt) 
-            VALUES ('${req.user.id}','${req.body.total_price}','${date}','${req.body.image}')`
+            transaction(user_id,total_price,transaction_date,payment_receipt,delivery_province,delivery_city,delivery_address) 
+            VALUES ('${req.user.id}','${req.body.total_price}','${date}',
+            '${req.body.image}','${req.body.province}','${req.body.city}','${req.body.address}')`
 
             connection.query(sql, (err, results) => {
                 if (err) {

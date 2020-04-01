@@ -60,7 +60,7 @@ module.exports = {
                 if (err) {
                     return res.status(500).send(err)
                 }
-                const sql2 = `SELECT SUM(total_ongkir) AS total_ongkir FROM cart;`
+                const sql2 = `SELECT SUM(total_ongkir) AS total_ongkir FROM cart WHERE transaction_id=0;`
                 connection.query(sql2, (err, results2) => {
                     if (err) {
                         return res.status(500).send(err)
