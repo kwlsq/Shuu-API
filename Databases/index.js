@@ -12,10 +12,10 @@
 const mysql = require('mysql');
 
 const connection = mysql.createConnection({
-  host: 'db4free.net',
-  user: 'vincentius',
-  password: 'skeletonspyro',
-  database: 'kwlsqxx',
+  host: 'us-cdbr-iron-east-01.cleardb.net',
+  user: 'bd3bbb02e22ae5',
+  password: '1fc77ef7',
+  database: 'heroku_2fc813c450ec87f',
   port: 3306
 });
 
