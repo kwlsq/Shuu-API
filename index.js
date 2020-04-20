@@ -3,7 +3,7 @@ const cors = require('cors')
 const bodyParser = require('body-parser')
 const bearerToken = require('express-bearer-token')
 
-const PORT = 4000
+const PORT = process.env.PORT || 4000
 
 const app = express()
 
