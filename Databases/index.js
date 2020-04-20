@@ -20,3 +20,6 @@ const connection = mysql.createConnection({
 });
 
 module.exports = connection
+
+//Error 1227 (42000) waktu import (Super privilege) => hilangin yang berbau DEFINE di file .sql
+//Error 1273 (HY000) => replace utf8mb4_0900_ai_ci jadi utf8mb4_general_ci di file .sql
